@@ -179,12 +179,12 @@ const Signup = () => {
         {/* Login Link */}
         <div className="text-center">
           <p className="text-gray-300 text-sm sm:text-base">
-            <span>Already have an account?</span>
+            Already have an account?{" "}
             <Link
               to="/login"
               className="text-secondary-purple font-semibold hover:underline transition-all duration-200"
             >
-              Sign In
+              Log In
             </Link>
           </p>
         </div>

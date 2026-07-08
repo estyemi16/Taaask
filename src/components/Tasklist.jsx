@@ -16,8 +16,11 @@ const Tasklist = ({
   const [newTitle, setNewTitle] = useState(taskTitle);
 
   const editTask = () => {
-    handleEditing(id, newTitle);
-    setIsEditing(false);
+    const wasUpdated = handleEditing(id, newTitle);
+
+    if (wasUpdated) {
+      setIsEditing(false);
+    }
   };
 
   const formatTimestamp = (timestamp) =>

@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -14,9 +16,15 @@ const Login = () => {
       return;
     }
     setError("");
+    setIsLoading(true);
+
     // Handle login logic here
     console.log("Login attempt:", { email, password });
-    navigate("/home");
+
+    window.setTimeout(() => {
+      setIsLoading(false);
+      navigate("/home");
+    }, 1000);
   };
 
   return (
@@ -47,7 +55,8 @@ const Login = () => {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg px-4 py-3 sm:py-3 border-2 border-secondary-purple bg-primary-purple/50 text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-secondary-purple focus:border-transparent transition-all duration-200"
+              disabled={isLoading}
+              className="w-full rounded-lg px-4 py-3 sm:py-3 border-2 border-secondary-purple bg-primary-purple/50 text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-secondary-purple focus:border-transparent transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-70"
               placeholder="Enter your email"
             />
           </div>
@@ -65,7 +74,8 @@ const Login = () => {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg px-4 py-3 sm:py-3 border-2 border-secondary-purple bg-primary-purple/50 text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-secondary-purple focus:border-transparent transition-all duration-200"
+              disabled={isLoading}
+              className="w-full rounded-lg px-4 py-3 sm:py-3 border-2 border-secondary-purple bg-primary-purple/50 text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-secondary-purple focus:border-transparent transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-70"
               placeholder="Enter your password"
             />
           </div>
@@ -90,9 +100,17 @@ const Login = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full rounded-lg bg-secondary-purple hover:bg-secondary-purple/80 transition-all duration-300 ease-in-out hover:cursor-pointer py-3 sm:py-4 font-semibold text-white text-base sm:text-lg hover:shadow-lg"
+            disabled={isLoading}
+            className="w-full rounded-lg bg-secondary-purple hover:bg-secondary-purple/80 transition-all duration-300 ease-in-out hover:cursor-pointer py-3 sm:py-4 font-semibold text-white text-base sm:text-lg hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-80"
           >
-            Sign In
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Signing In...
+              </span>
+            ) : (
+              "Sign In"
+            )}
           </button>
         </form>
 
@@ -111,7 +129,7 @@ const Login = () => {
               to="/signup"
               className="text-secondary-purple font-semibold hover:underline transition-all duration-200"
             >
-              Sign Up
+              Create one
             </Link>
           </p>
         </div>

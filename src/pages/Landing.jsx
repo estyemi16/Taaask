@@ -9,9 +9,9 @@ const Landing = () => {
         {/* Header Section */}
         <div className="space-y-4">
           <div className="inline-block">
-            <div className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-4">
+            {/* <div className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-4">
               Taskify
-            </div>
+            </div> */}
           </div>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
             Organize Your Tasks,{" "}

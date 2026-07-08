@@ -3,6 +3,7 @@ import InputField from "./InputField";
 import Button from "./Button";
 import Tasklist from "./Tasklist";
 import Listheader from "./Listheader";
+import ToastContainer from "./ToastContainer";
 
 const Card = () => {
   // const [count, setCount] = useState(0);
@@ -22,6 +23,7 @@ const Card = () => {
   const [filter, setFilter] = useState("default");
   const [deleteTaskId, setDeleteTaskId] = useState(null);
   const [deleteTaskTitle, setDeleteTaskTitle] = useState("");
+  const [toasts, setToasts] = useState([]);
 
   const filteredTasks = allTasks
     .filter((task) => {
@@ -40,24 +42,37 @@ const Card = () => {
     localStorage.setItem("allTasks", JSON.stringify(allTasks));
   }, [allTasks]);
 
+  const showToast = (message, type = "success") => {
+    const id = Date.now() + Math.random();
+    setToasts((prev) => [...prev, { id, message, type }]);
+
+    window.setTimeout(() => {
+      setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    }, 3000);
+  };
+
   // SUBMIT
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (task.trim() !== "") {
-      const timestamp = new Date().toISOString();
-      const newTask = {
-        id: Date.now(),
-        title: task,
-        completed: false,
-        createdAt: timestamp,
-        updatedAt: timestamp,
-        completedAt: null,
-      };
-
-      setAllTasks([...allTasks, newTask]);
-      setTask("");
+    if (task.trim() === "") {
+      showToast("Please enter a task before adding.", "warning");
+      return;
     }
+
+    const timestamp = new Date().toISOString();
+    const newTask = {
+      id: Date.now(),
+      title: task.trim(),
+      completed: false,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      completedAt: null,
+    };
+
+    setAllTasks((prev) => [...prev, newTask]);
+    setTask("");
+    showToast("Task added successfully.", "success");
   };
 
   useEffect(() => {
@@ -73,9 +88,10 @@ const Card = () => {
 
   const handleConfirmDelete = () => {
     if (deleteTaskId === null) return;
-    setAllTasks(allTasks.filter((task) => task.id !== deleteTaskId));
+    setAllTasks((prev) => prev.filter((task) => task.id !== deleteTaskId));
     setDeleteTaskId(null);
     setDeleteTaskTitle("");
+    showToast("Task removed successfully.", "success");
   };
 
   const cancelDelete = () => {
@@ -85,8 +101,12 @@ const Card = () => {
 
   // COMPLETED & UNCOMPLETED
   const toggleTask = (id) => {
-    setAllTasks(
-      allTasks.map((task) =>
+    const taskToToggle = allTasks.find((task) => task.id === id);
+
+    if (!taskToToggle) return;
+
+    setAllTasks((prev) =>
+      prev.map((task) =>
         task.id === id
           ? {
               ...task,
@@ -97,17 +117,32 @@ const Card = () => {
           : task,
       ),
     );
+
+    showToast(
+      taskToToggle.completed ? "Task marked as active." : "Task marked as completed.",
+      "success",
+    );
   };
 
   // EDIT
   const handleEditing = (id, newTitle) => {
-    setAllTasks(
-      allTasks.map((task) =>
+    const trimmedTitle = newTitle.trim();
+
+    if (trimmedTitle === "") {
+      showToast("Task title cannot be empty.", "warning");
+      return false;
+    }
+
+    setAllTasks((prev) =>
+      prev.map((task) =>
         task.id === id
-          ? { ...task, title: newTitle, updatedAt: new Date().toISOString() }
+          ? { ...task, title: trimmedTitle, updatedAt: new Date().toISOString() }
           : task,
       ),
     );
+
+    showToast("Task edited successfully.", "success");
+    return true;
   };
 
   return (
@@ -140,7 +175,7 @@ const Card = () => {
                 type="button"
                 key={option.value}
                 onClick={() => setFilter(option.value)}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                className={`rounded-full px-4 py-2 text-sm cursor-pointer font-medium transition ${
                   filter === option.value
                     ? "bg-secondary-purple text-white"
                     : "bg-white/10 text-white hover:bg-white/20"
@@ -254,13 +289,15 @@ const Card = () => {
         )}
       </div>
 
+      <ToastContainer toasts={toasts} />
+
       {deleteTaskId !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
-            <h2 className="text-xl font-semibold text-slate-900 mb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 px-4">
+          <div className="w-full max-w-md rounded-3xl bg-primary-purple p-6 shadow-2xl ring-1 ring-white/10">
+            <h2 className="mb-3 text-xl font-semibold text-white">
               Confirm Delete
             </h2>
-            <p className="text-sm text-slate-600 mb-6">
+            <p className="mb-6 text-sm text-white/80">
               Are you sure you want to delete "{deleteTaskTitle}"?
               This action cannot be undone.
             </p>
@@ -268,14 +305,14 @@ const Card = () => {
               <button
                 type="button"
                 onClick={cancelDelete}
-                className="rounded-full border border-slate-300 px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
+                className="rounded-full border border-secondary-purple bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/20"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleConfirmDelete}
-                className="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
+                className="rounded-full bg-rose-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-600"
               >
                 Delete Task
               </button>
