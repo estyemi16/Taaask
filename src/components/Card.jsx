@@ -75,9 +75,12 @@ const Card = () => {
     showToast("Task added successfully.", "success");
   };
 
-  useEffect(() => {
-    console.log(allTasks);
-  }, [allTasks]);
+  const handleTaskInputKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  };
 
   // DELETE
   const handleDeleteRequest = (id) => {
@@ -157,10 +160,11 @@ const Card = () => {
             <InputField
               value={task}
               onChange={(e) => setTask(e.target.value)}
+              onKeyDown={handleTaskInputKeyDown}
               placeholder="Enter your task"
             />
           </div>
-          <Button handleSubmit={handleSubmit} value={"+"} css={"py-2"} />
+          <Button handleSubmit={handleSubmit} type="submit" value={"+"} css={"py-2"} />
         </div>
 
         <div className="flex flex-col gap-3">
