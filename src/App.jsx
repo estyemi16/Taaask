@@ -1,10 +1,16 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 import { Home as HomeIcon } from "lucide-react";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Landing from "./pages/Landing";
+import { getCurrentUser } from "./utils/auth";
+
+const ProtectedRoute = ({ children }) => {
+  const currentUser = getCurrentUser();
+  return currentUser ? children : <Navigate to="/login" replace />;
+};
 
 const App = () => {
   return (
@@ -22,7 +28,14 @@ const App = () => {
         </div>
         <Routes>
           <Route path="/" element={<Landing />} />
-          <Route path="/home" element={<Home />} />
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
         </Routes>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { signupUser } from "../utils/auth";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ const Signup = () => {
     confirmPassword: "",
   });
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -39,9 +41,18 @@ const Signup = () => {
     }
 
     setError("");
-    // Handle signup logic here
-    console.log("Signup attempt:", { fullName, email, password });
-    navigate("/login");
+    setIsLoading(true);
+
+    const result = signupUser({ fullName, email, password });
+
+    window.setTimeout(() => {
+      setIsLoading(false);
+      if (!result.success) {
+        setError(result.message);
+        return;
+      }
+      navigate("/login");
+    }, 500);
   };
 
   return (
@@ -59,6 +70,13 @@ const Signup = () => {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-5">
+          {/* Error Message */}
+          {error && (
+            <div className="p-3 sm:p-4 rounded-lg bg-red-500/20 border border-red-500 text-red-200 text-sm">
+              {error}
+            </div>
+          )}
+
           {/* Full Name Field */}
           <div className="flex flex-col gap-2">
             <label
@@ -135,13 +153,6 @@ const Signup = () => {
             />
           </div>
 
-          {/* Error Message */}
-          {error && (
-            <div className="p-3 sm:p-4 rounded-lg bg-red-500/20 border border-red-500 text-red-200 text-sm">
-              {error}
-            </div>
-          )}
-
           {/* Terms and Conditions */}
           <div className="flex items-start gap-2">
             <input
@@ -163,9 +174,10 @@ const Signup = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full rounded-lg bg-secondary-purple hover:bg-secondary-purple/80 transition-all duration-300 ease-in-out hover:cursor-pointer py-3 sm:py-4 font-semibold text-white text-base sm:text-lg hover:shadow-lg"
+            disabled={isLoading}
+            className="w-full rounded-lg bg-secondary-purple hover:bg-secondary-purple/80 transition-all duration-300 ease-in-out hover:cursor-pointer py-3 sm:py-4 font-semibold text-white text-base sm:text-lg hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-80"
           >
-            Create Account
+            {isLoading ? "Creating Account..." : "Create Account"}
           </button>
         </form>
 

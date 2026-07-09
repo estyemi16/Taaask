@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { loginUser } from "../utils/auth";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -18,13 +19,16 @@ const Login = () => {
     setError("");
     setIsLoading(true);
 
-    // Handle login logic here
-    console.log("Login attempt:", { email, password });
+    const result = loginUser(email, password);
 
     window.setTimeout(() => {
       setIsLoading(false);
+      if (!result.success) {
+        setError(result.message);
+        return;
+      }
       navigate("/home");
-    }, 1000);
+    }, 500);
   };
 
   return (
@@ -42,6 +46,13 @@ const Login = () => {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-5">
+          {/* Error Message */}
+          {error && (
+            <div className="p-3 sm:p-4 rounded-lg bg-red-500/20 border border-red-500 text-red-200 text-sm">
+              {error}
+            </div>
+          )}
+
           {/* Email Field */}
           <div className="flex flex-col gap-2">
             <label
@@ -79,13 +90,6 @@ const Login = () => {
               placeholder="Enter your password"
             />
           </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="p-3 sm:p-4 rounded-lg bg-red-500/20 border border-red-500 text-red-200 text-sm">
-              {error}
-            </div>
-          )}
 
           {/* Forgot Password Link */}
           <div className="text-right">
